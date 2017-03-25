@@ -26,9 +26,12 @@ class HockeyClient(LineReceiver, object):
         line = line.decode('UTF-8')
         if self.debug:
             print('Server said:', line)
-        if '{} is active player'.format(self.name) in line or 'invalid move' in line:
+        if '{} is active player'.format(self.name) in line:
+            self.play_game()
+        if 'invalid move' in line:
             result = Action.from_number(random.randint(0, 7))
             self.sendLine(result)
+            return
         if 'ball is' in line:
             tuple = line.split(' ')[3:5]
             tuple = (int(tuple[0].strip(',').strip('(')), int(tuple[1].strip(')')))
