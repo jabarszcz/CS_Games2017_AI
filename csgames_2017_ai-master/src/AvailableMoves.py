@@ -67,8 +67,8 @@ class MovesChecker:
                 yield x
 
     def tryMove(self, position, directions): #directions so far
-        if(position[0] < 0 or position[0] > 10 or position[1] < 0 or position[1] > 10): 
-            if not ( (position[0] == 5 and position[1] == -1) or (position[0] == 5 and position[1] == 11) ):
+        if(position[0] < 0 or position[0] > 14 or position[1] < 0 or position[1] > 14): 
+            if not ( (position[0] == 7 and position[1] == -1) or (position[0] == 7 and position[1] == 15) ):
                 return
         if(position in self.visited):
             return
