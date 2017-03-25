@@ -40,28 +40,28 @@ class MovesChecker:
         avail = all - neigh
         
         if (position[0],  position[1]+1) in avail :
-            for x in  self.tryMove( (position[0],  position[1]+1), directions + [Direction.UP] )
+            for x in  self.tryMove( (position[0],  position[1]+1), directions + [Direction.UP] ):
                 yield x
         if (position[0],  position[1]-1) in avail :
-            for x in  self.tryMove( (position[0],  position[1]-1), directions + [Direction.DOWN] )
+            for x in  self.tryMove( (position[0],  position[1]-1), directions + [Direction.DOWN] ):
                 yield x
         if (position[0]-1,position[1]) in avail :
-            for x in  self.tryMove( (position[0]-1,position[1])  , directions + [Direction.LEFT] )
+            for x in  self.tryMove( (position[0]-1,position[1])  , directions + [Direction.LEFT] ):
                 yield x
         if (position[0]+1,position[1]) in avail :
-            for x in  self.tryMove( (position[0]+1,position[1])  , directions + [Direction.RIGHT] 
+            for x in  self.tryMove( (position[0]+1,position[1])  , directions + [Direction.RIGHT] ):
                 yield x
         if (position[0]-1,position[1]+1) in avail :
-            for x in  self.tryMove( (position[0]-1,position[1]+1), directions + [Direction.UPLEFT] )
+            for x in  self.tryMove( (position[0]-1,position[1]+1), directions + [Direction.UPLEFT] ):
                 yield x
         if (position[0]+1,position[1]+1) in avail :
-            for x in  self.tryMove( (position[0]+1,position[1]+1), directions + [Direction.UPRIGHT] )
+            for x in  self.tryMove( (position[0]+1,position[1]+1), directions + [Direction.UPRIGHT] ):
                 yield x
         if (position[0]-1,position[1]-1) in avail :
-            for x in  self.tryMove( (position[0]-1,position[1]-1), directions + [Direction.DOWNLEFT] )
+            for x in  self.tryMove( (position[0]-1,position[1]-1), directions + [Direction.DOWNLEFT] ):
                 yield x
         if (position[0]+1,position[1]-1) in avail :
-            for x in  self.tryMove( (position[0]+1,position[1]-1), directions + [Direction.DOWNRIGHT] )
+            for x in  self.tryMove( (position[0]+1,position[1]-1), directions + [Direction.DOWNRIGHT] ):
                 yield x
 
     def tryMove(self, position, directions): #directions so far
