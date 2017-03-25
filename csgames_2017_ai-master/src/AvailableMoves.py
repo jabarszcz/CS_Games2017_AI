@@ -20,7 +20,8 @@ class MovesChecker:
         
         #Iterate on toVisit positions
         self.visited.add(position)
-        self.tryAllMoves(position, [])
+        for x in self.tryAllMoves(position, []):
+            yield x
 
     def tryAllMoves(self, position, directions):    
         #todo check if arc is already taken
@@ -39,21 +40,21 @@ class MovesChecker:
         avail = all - neigh
         
         if (position[0],  position[1]+1) in avail :
-            self.tryMove( (position[0],  position[1]+1), directions + [Direction.UP] )
+            yield self.tryMove( (position[0],  position[1]+1), directions + [Direction.UP] )
         if (position[0],  position[1]-1) in avail :
-            self.tryMove( (position[0],  position[1]-1), directions + [Direction.DOWN] )
+            yield self.tryMove( (position[0],  position[1]-1), directions + [Direction.DOWN] )
         if (position[0]-1,position[1]) in avail :
-            self.tryMove( (position[0]-1,position[1])  , directions + [Direction.LEFT] )
+            yield self.tryMove( (position[0]-1,position[1])  , directions + [Direction.LEFT] )
         if (position[0]+1,position[1]) in avail :
-            self.tryMove( (position[0]+1,position[1])  , directions + [Direction.RIGHT] )
+            yield self.tryMove( (position[0]+1,position[1])  , directions + [Direction.RIGHT] )
         if (position[0]-1,position[1]+1) in avail :
-            self.tryMove( (position[0]-1,position[1]+1), directions + [Direction.UPLEFT] )
+            yield self.tryMove( (position[0]-1,position[1]+1), directions + [Direction.UPLEFT] )
         if (position[0]+1,position[1]+1) in avail :
-            self.tryMove( (position[0]+1,position[1]+1), directions + [Direction.UPRIGHT] )
+            yield self.tryMove( (position[0]+1,position[1]+1), directions + [Direction.UPRIGHT] )
         if (position[0]-1,position[1]-1) in avail :
-            self.tryMove( (position[0]-1,position[1]-1), directions + [Direction.DOWNLEFT] )
+            yield self.tryMove( (position[0]-1,position[1]-1), directions + [Direction.DOWNLEFT] )
         if (position[0]+1,position[1]-1) in avail :
-            self.tryMove( (position[0]+1,position[1]-1), directions + [Direction.DOWNRIGHT] )
+            yield self.tryMove( (position[0]+1,position[1]-1), directions + [Direction.DOWNRIGHT] )
 
     def tryMove(self, position, directions): #directions so far
         if(position[0] < 0 or position[0] > 10 or position[1] < 0 or position[1] > 10): 
@@ -64,9 +65,10 @@ class MovesChecker:
         self.visited.add(position)
         
         if(self.environment.is_visited(position)):
-            self.tryAllMoves(position, directions)
+            for x in self.tryAllMoves(position, directions):
+                yield x
         else:
-            print(directions)
+            yield (position, directions)
         
         
     
