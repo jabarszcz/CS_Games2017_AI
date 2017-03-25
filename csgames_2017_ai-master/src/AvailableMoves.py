@@ -1,13 +1,13 @@
 
 Direction = {
-    'UP': 1,
-     'DOWN' : 2,
-     'LEFT' : 3,
-     'RIGHT' : 4,
-     'UPLEFT' : 5,
-     'UPRIGHT' : 6,
-     'DOWNLEFT' : 7,
-     'DOWNRIGHT' : 8,
+    'UP': 0,
+     'DOWN' : 4,
+     'LEFT' : 6,
+     'RIGHT' : 2,
+     'UPLEFT' : 7,
+     'UPRIGHT' : 1,
+     'DOWNLEFT' : 5,
+     'DOWNRIGHT' : 3,
 }
 
      
