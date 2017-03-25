@@ -17,9 +17,7 @@ class HockeyClient(LineReceiver, object):
         self.debug = debug
         self.env = Environnement()
         self.r = re.compile('polarity of the goal has been inverted - \d*')
-        self.r2 = re.compile('power up is at (\d*, \d*) - \d*')
-        self.r3 = re.compile('ball is at (\d*, \d*) - \d*')
-        self.r4 = re.compile('your goal is at (\d*, \d*) - \d*')
+        self.r4 = re.compile('your goal is \w+ - \d*')
 
     def connectionMade(self):
         self.sendLine(self.name)
@@ -37,14 +35,20 @@ class HockeyClient(LineReceiver, object):
         if 'invalid move' in line:
             result = Action.from_number(random.randint(0, 7))
             self.sendLine(result)
-        if re.match(self.r3, line):
-            tuple = line.split(' ')[3:5]
-            tuple = (int(tuple[0].strip(',').strip('(')), int(tuple[1].strip(')')))
-            self.env.init_pos(tuple)
-        if re.match(self.r2, line):
-            tuple = line.split(' ')[3:5]
-            tuple = (int(tuple[0].strip(',').strip('(')), int(tuple[1].strip(')')))
-            self.env.power_up = tuple
+        if 'ball is at' in line:
+            try:
+                tuple = line.split(' ')[3:5]
+                tuple = (int(tuple[0].strip(',').strip('(')), int(tuple[1].strip(')')))
+                self.env.init_pos(tuple)
+            except:
+                pass
+        if 'power up is at' in line:
+            try:
+                tuple = line.split(' ')[4:6]
+                tuple = (int(tuple[0].strip(',').strip('(')), int(tuple[1].strip(')')))
+                self.env.power_up = tuple
+            except:
+                pass
         if re.match(self.r4, line):
             goal_str = line.split(' ')[-3]
             if goal_str == 'north':

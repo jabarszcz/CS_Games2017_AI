@@ -2,9 +2,9 @@ from hockey.action import Action
 
 class Environnement(object):
     def __init__(self):
-        self.visited = {(i,j): 0 for j in range(-1, 15) for i in range(-1, 15)}
-        self.neighbours = {(i,j): [] for j in range(-1, 15) for i in range(-1, 15)}
-        self.current_pos = (5,5)
+        self.visited = {(i,j): 0 for j in range(-1, 16) for i in range(-1, 16)}
+        self.neighbours = {(i,j): [] for j in range(-1, 16) for i in range(-1, 16)}
+        self.current_pos = (7,7)
         self.possible_goal = [(7, -1), (7, 15)]
         self.goal_idx = 0
         self.power_up = (0,0)
