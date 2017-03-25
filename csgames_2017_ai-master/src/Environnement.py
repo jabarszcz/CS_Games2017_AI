@@ -2,8 +2,8 @@ from hockey.action import Action
 
 class Environnement(object):
     def __init__(self):
-        self.visited = {(i,j): 0 for j in range(11) for i in range(11)}
-        self.neighbours = {(i,j): [] for j in range(11) for i in range(11)}
+        self.visited = {(i,j): 0 for j in range(-1, 11) for i in range(-1, 11)}
+        self.neighbours = {(i,j): [] for j in range(-1, 11) for i in range(-1, 11)}
         self.current_pos = (5,5)
 
     def is_visited(self, node):
