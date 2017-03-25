@@ -98,8 +98,8 @@ class GameState:
         print(dis_comp) # TODO test if it is good
         power_up_comp = 1 if self.env.power_up_avail and max_player else 0
         total = dis_comp
-        if total != 0:
-            total += 0.2 * power_up_comp
+        if total != 1:
+            total -= 0.2 * (1-power_up_comp)
         # TODO add taking the power_up
         return total
 

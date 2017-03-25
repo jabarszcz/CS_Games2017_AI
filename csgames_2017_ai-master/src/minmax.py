@@ -12,7 +12,7 @@ def minmax(gamestate, cutoff=5, prune=True):
     value, move = max_value(gamestate, cutoff=cutoff, prune=prune)
     return move
 
-def max_value(gamestate, depth=0, alpha=inf, beta=-inf, cutoff=5, prune=True):
+def max_value(gamestate, depth=0, alpha=-inf, beta=inf, cutoff=5, prune=True):
     if depth >= cutoff:
         return (gamestate.utility_heuristic(max_player=True), None)
     value, best = -inf, None
@@ -26,7 +26,7 @@ def max_value(gamestate, depth=0, alpha=inf, beta=-inf, cutoff=5, prune=True):
         alpha = max(alpha, value)
     return (value, best)
 
-def min_value(gamestate, depth, alpha=inf, beta=-inf, cutoff=5, prune=True):
+def min_value(gamestate, depth, alpha=-inf, beta=inf, cutoff=5, prune=True):
     if depth >= cutoff:
         return (gamestate.utility_heuristic(max_player=False), None)
     value, best = -inf, None
