@@ -68,7 +68,7 @@ class MovesChecker:
 
     def tryMove(self, position, directions): #directions so far
         if(position[0] < 0 or position[0] > 10 or position[1] < 0 or position[1] > 10): 
-            if !( (position[0] == 5 and position[1] == -1) or (position[0] == 5 and position[1] == 11) )
+            if not ( (position[0] == 5 and position[1] == -1) or (position[0] == 5 and position[1] == 11) ):
                 return
         if(position in self.visited):
             return
