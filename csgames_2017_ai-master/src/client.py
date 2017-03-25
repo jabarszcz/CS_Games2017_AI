@@ -27,7 +27,8 @@ class HockeyClient(LineReceiver, object):
         if self.debug:
             print('Server said:', line)
         if '{} is active player'.format(self.name) in line or 'invalid move' in line:
-            self.play_game()
+            result = Action.from_number(random.randint(0, 7))
+            self.sendLine(result)
         if 'ball is' in line:
             tuple = line.split(' ')[3:5]
             tuple = (int(tuple[0].strip(',').strip('(')), int(tuple[1].strip(')')))
@@ -47,7 +48,6 @@ class HockeyClient(LineReceiver, object):
                 self.env.goal = (5, 11)
 
     def play_game(self):
-        #result = Action.from_number(random.randint(0, 7))
         movs = MovesChecker(self.env)
         dis, best = sys.maxint, 0
         for move in movs.availableMoves(self.env.current_pos):
