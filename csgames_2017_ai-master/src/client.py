@@ -5,12 +5,14 @@ from twisted.internet import reactor
 from twisted.protocols.basic import LineReceiver
 
 from hockey.action import Action
+from Environnement import Environnement
 
 
 class HockeyClient(LineReceiver, object):
     def __init__(self, name, debug):
         self.name = name
         self.debug = debug
+        self.env = Environnement()
 
     def connectionMade(self):
         self.sendLine(self.name)
@@ -24,6 +26,17 @@ class HockeyClient(LineReceiver, object):
             print('Server said:', line)
         if '{} is active player'.format(self.name) in line or 'invalid move' in line:
             self.play_game()
+        if 'ball is' in line:
+            tuple = line.split(' ')[3:5]
+            tuple = (int(tuple[0].strip(',').strip('(')), int(tuple[1].strip(')')))
+            self.env.init_pos(tuple)
+        if 'did go' in line:
+            possible_line = line.split(' ')[-4]
+            direction = ''
+            if possible_line == 'north' or possible_line == 'south':
+                direction += possible_line + ' '
+            direction += line.split(' ')[-3]
+            self.env.visit(direction)
 
     def play_game(self):
         result = Action.from_number(random.randint(0, 7))
@@ -49,7 +62,7 @@ class ClientFactory(protocol.ClientFactory):
         reactor.stop()
 
 
-name = "Bob{}".format(random.randint(0, 999))
+name = "poly caulking{}".format(random.randint(0, 999))
 
 f = ClientFactory(name, debug=True)
 reactor.connectTCP("localhost", 8023, f)
