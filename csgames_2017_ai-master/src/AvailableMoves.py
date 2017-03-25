@@ -81,7 +81,7 @@ class MovesChecker:
             for x in self.tryAllMoves(position, directions, stillHavePowerUp, usedPowerUpAtMove):
                 yield x
         elif stillHavePowerUp:
-            for x in self.tryAllMoves(position, directions, False, len(directions)):
+            for x in self.tryAllMoves(position, directions, False, len(directions)-1):
                 yield x
         else:
             print(position)
