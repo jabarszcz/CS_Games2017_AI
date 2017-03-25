@@ -2,9 +2,14 @@ from hockey.action import Action
 
 class Environnement(object):
     def __init__(self):
-        self.visited = {(i,j): 0 for j in range(-1, 11) for i in range(-1, 11)}
-        self.neighbours = {(i,j): [] for j in range(-1, 11) for i in range(-1, 11)}
-        self.current_pos = (5,5)
+        self.visited = {(i,j): 0 for j in range(-1, 16) for i in range(-1, 16)}
+        self.neighbours = {(i,j): [] for j in range(-1, 16) for i in range(-1, 16)}
+        self.current_pos = (7,7)
+        self.possible_goal = [(7, -1), (7, 15)]
+        self.goal_idx = 0
+        self.power_up = (0,0)
+        self.power_up_avail = False
+        self.power_up_taken = False
 
     def is_visited(self, node):
         return self.visited[node] > 0
@@ -24,8 +29,18 @@ class Environnement(object):
             self.neighbours[new_pos].append(self.current_pos)
             self.neighbours[self.current_pos].append(new_pos)
             self.current_pos = new_pos
+            if self.current_pos == self.power_up_taken:
+                self.power_up_taken = True
+                print 'power up taken'
         except:
             pass
+
+    def try_take(self, pos):
+        if not self.power_up_taken and pos == self.power_up:
+            self.power_up_avail = True
+
+    def use_power_up(self):
+        self.power_up_avail = False
 
     def unvisit(self, action):
         delta = Action.move[action]
@@ -35,6 +50,11 @@ class Environnement(object):
         self.neighbours[self.current_pos].remove(new_pos)
         self.current_pos = new_pos
 
+    def my_goal(self):
+        return self.possible_goal[self.goal_idx]
+
+    def other_goal(self):
+        return self.possible_goal[(self.goal_idx + 1) % 2]
 
 if __name__ == '__main__':
     env = Environnement()

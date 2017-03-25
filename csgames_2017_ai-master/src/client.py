@@ -8,6 +8,7 @@ from hockey.action import Action
 from Environnement import Environnement
 from AvailableMoves import *
 import sys
+import re
 
 
 class HockeyClient(LineReceiver, object):
@@ -15,6 +16,8 @@ class HockeyClient(LineReceiver, object):
         self.name = name
         self.debug = debug
         self.env = Environnement()
+        self.r = re.compile('polarity of the goal has been inverted - \d*')
+        self.r4 = re.compile('your goal is \w+ - \d*')
 
     def connectionMade(self):
         self.sendLine(self.name)
@@ -24,6 +27,7 @@ class HockeyClient(LineReceiver, object):
 
     def lineReceived(self, line):
         line = line.decode('UTF-8')
+
         if self.debug:
             print('Server said:', line)
         if '{} is active player'.format(self.name) in line:
@@ -31,11 +35,26 @@ class HockeyClient(LineReceiver, object):
         if 'invalid move' in line:
             result = Action.from_number(random.randint(0, 7))
             self.sendLine(result)
-            return
-        if 'ball is' in line:
-            tuple = line.split(' ')[3:5]
-            tuple = (int(tuple[0].strip(',').strip('(')), int(tuple[1].strip(')')))
-            self.env.init_pos(tuple)
+        if 'ball is at' in line:
+            try:
+                tuple = line.split(' ')[3:5]
+                tuple = (int(tuple[0].strip(',').strip('(')), int(tuple[1].strip(')')))
+                self.env.init_pos(tuple)
+            except:
+                pass
+        if 'power up is at' in line:
+            try:
+                tuple = line.split(' ')[4:6]
+                tuple = (int(tuple[0].strip(',').strip('(')), int(tuple[1].strip(')')))
+                self.env.power_up = tuple
+            except:
+                pass
+        if re.match(self.r4, line):
+            goal_str = line.split(' ')[-3]
+            if goal_str == 'north':
+                self.env.goal_idx = 0
+            else:
+                self.env.goal_idx = 1
         if 'did go' in line:
             possible_line = line.split(' ')[-4]
             direction = ''
@@ -43,19 +62,16 @@ class HockeyClient(LineReceiver, object):
                 direction += possible_line + ' '
             direction += line.split(' ')[-3]
             self.env.visit(direction)
-        if 'your goal is' in line:
-            goal_str = line.split(' ')[-3]
-            if goal_str != 'north':
-                self.env.goal = (5, -1)
-            else:
-                self.env.goal = (5, 11)
+        if re.match(self.r, line):
+            self.env.goal_idx = (self.env.goal_idx + 1) % 2
+            print 'invted', self.env.my_goal()
 
     def play_game(self):
         movs = MovesChecker(self.env)
         dis, best = sys.maxint, 0
         for move in movs.availableMoves(self.env.current_pos):
             pos, dirs = move
-            dis, best = min((dis, best), (self.distance(self.env.goal, pos), dirs[0]))
+            dis, best = min((dis, best), (self.distance(self.env.my_goal(), pos), dirs[0]))
         self.sendLine(Action.from_number(best))
 
     def distance(self, a, b):
@@ -83,7 +99,7 @@ class ClientFactory(protocol.ClientFactory):
         reactor.stop()
 
 
-name = "poly caulking did go south {}".format(random.randint(0, 999))
+name = "poly caulking did go south polarity of the goal has been inverted {}".format(random.randint(0, 999))
 
 f = ClientFactory(name, debug=True)
 reactor.connectTCP("localhost", 8023, f)
