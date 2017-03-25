@@ -7,6 +7,7 @@ from twisted.protocols.basic import LineReceiver
 from hockey.action import Action
 from Environnement import Environnement
 from AvailableMoves import *
+import sys
 
 
 class HockeyClient(LineReceiver, object):
@@ -40,24 +41,24 @@ class HockeyClient(LineReceiver, object):
             self.env.visit(direction)
         if 'your goal is' in line:
             goal_str = line.split(' ')[-3]
-            if goal_str == 'north':
-                self.env.goal = (-1, 5)
+            if goal_str != 'north':
+                self.env.goal = (5, -1)
             else:
-                self.env.goal = (11, 5)
+                self.env.goal = (5, 11)
 
     def play_game(self):
         #result = Action.from_number(random.randint(0, 7))
         movs = MovesChecker(self.env)
-        dis = inf
+        dis, best = sys.maxint, 0
         for move in movs.availableMoves(self.env.current_pos):
             pos, dirs = move
-            dis, best = min((dis, best), (distance(self.env.current_pos, pos), dirs[0]))
+            dis, best = min((dis, best), (self.distance(self.env.goal, pos), dirs[0]))
         self.sendLine(Action.from_number(best))
 
-    def distance(a, b):
+    def distance(self, a, b):
         ax, ay = a
         bx, by = b
-        return max(abs(ax-bx), abs(ay, by))
+        return max(abs(ax-bx), abs(ay-by))
 
 
 class ClientFactory(protocol.ClientFactory):
