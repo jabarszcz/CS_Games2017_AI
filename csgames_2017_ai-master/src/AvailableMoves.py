@@ -16,16 +16,18 @@ class MovesChecker:
         self.environment = environment
         self.visited = set()
         
-    def availableMoves(self, position):
+    def availableMoves(self, position, havePowerUp):
         #position[0]:x
         #position[1]:y
         
+        self.havePowerUp = havePowerUp
+        
         #Iterate on toVisit positions
         self.visited.add(position)
-        for x in self.tryAllMoves(position, []):
+        for x in self.tryAllMoves(position, [], havePowerUp, 0):
             yield x
 
-    def tryAllMoves(self, position, directions):    
+    def tryAllMoves(self, position, directions, stillHavePowerUp, usedPowerUpAtMove):    
         #todo check if arc is already taken
         
         neigh = set(self.environment.get_neighbours(position))
@@ -42,31 +44,31 @@ class MovesChecker:
         avail = all - neigh
         
         if (position[0],  position[1]+1) in avail :
-            for x in  self.tryMove( (position[0],  position[1]+1), directions + [Direction['UP']] ):
+            for x in  self.tryMove( (position[0],  position[1]+1), directions + [Direction['UP']], stillHavePowerUp, usedPowerUpAtMove ):
                 yield x
         if (position[0],  position[1]-1) in avail :
-            for x in  self.tryMove( (position[0],  position[1]-1), directions + [Direction['DOWN']] ):
+            for x in  self.tryMove( (position[0],  position[1]-1), directions + [Direction['DOWN']], stillHavePowerUp, usedPowerUpAtMove ):
                 yield x
         if (position[0]-1,position[1]) in avail :
-            for x in  self.tryMove( (position[0]-1,position[1])  , directions + [Direction['LEFT']] ):
+            for x in  self.tryMove( (position[0]-1,position[1])  , directions + [Direction['LEFT']], stillHavePowerUp, usedPowerUpAtMove ):
                 yield x
         if (position[0]+1,position[1]) in avail :
-            for x in  self.tryMove( (position[0]+1,position[1])  , directions + [Direction['RIGHT']] ):
+            for x in  self.tryMove( (position[0]+1,position[1])  , directions + [Direction['RIGHT']], stillHavePowerUp, usedPowerUpAtMove ):
                 yield x
         if (position[0]-1,position[1]+1) in avail :
-            for x in  self.tryMove( (position[0]-1,position[1]+1), directions + [Direction['UPLEFT']] ):
+            for x in  self.tryMove( (position[0]-1,position[1]+1), directions + [Direction['UPLEFT']], stillHavePowerUp, usedPowerUpAtMove ):
                 yield x
         if (position[0]+1,position[1]+1) in avail :
-            for x in  self.tryMove( (position[0]+1,position[1]+1), directions + [Direction['UPRIGHT']] ):
+            for x in  self.tryMove( (position[0]+1,position[1]+1), directions + [Direction['UPRIGHT']], stillHavePowerUp, usedPowerUpAtMove ):
                 yield x
         if (position[0]-1,position[1]-1) in avail :
-            for x in  self.tryMove( (position[0]-1,position[1]-1), directions + [Direction['DOWNLEFT']] ):
+            for x in  self.tryMove( (position[0]-1,position[1]-1), directions + [Direction['DOWNLEFT']], stillHavePowerUp, usedPowerUpAtMove ):
                 yield x
         if (position[0]+1,position[1]-1) in avail :
-            for x in  self.tryMove( (position[0]+1,position[1]-1), directions + [Direction['DOWNRIGHT']] ):
+            for x in  self.tryMove( (position[0]+1,position[1]-1), directions + [Direction['DOWNRIGHT']], stillHavePowerUp, usedPowerUpAtMove ):
                 yield x
 
-    def tryMove(self, position, directions): #directions so far
+    def tryMove(self, position, directions, stillHavePowerUp, usedPowerUpAtMove): #directions so far
         if(position[0] < 0 or position[0] > 14 or position[1] < 0 or position[1] > 14): 
             if not ( (position[0] == 7 and position[1] == -1) or (position[0] == 7 and position[1] == 15) ):
                 return
@@ -76,11 +78,15 @@ class MovesChecker:
         self.visited.add(position)
         
         if(self.environment.is_visited(position)):
-            for x in self.tryAllMoves(position, directions):
+            for x in self.tryAllMoves(position, directions, stillHavePowerUp, usedPowerUpAtMove):
+                yield x
+        elif stillHavePowerUp:
+            for x in self.tryAllMoves(position, directions, False, len(directions)):
                 yield x
         else:
             print(position)
-            yield (position, directions)
+            usedPowerUp = (not(stillHavePowerUp) and self.havePowerUp)
+            yield (position, directions, usedPowerUp, usedPowerUpAtMove)
 
         
         
