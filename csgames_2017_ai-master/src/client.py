@@ -62,7 +62,7 @@ class ClientFactory(protocol.ClientFactory):
         reactor.stop()
 
 
-name = "poly caulking{}".format(random.randint(0, 999))
+name = "poly caulking did go south {}".format(random.randint(0, 999))
 
 f = ClientFactory(name, debug=True)
 reactor.connectTCP("localhost", 8023, f)

@@ -17,12 +17,15 @@ class Environnement(object):
         return self.neighbours[node]
 
     def visit(self, action):
-        delta = Action.move[action]
-        new_pos = (self.current_pos[0] + delta[0], self.current_pos[1] + delta[1])
-        self.visited[new_pos] += 1
-        self.neighbours[new_pos].append(self.current_pos)
-        self.neighbours[self.current_pos].append(new_pos)
-        self.current_pos = new_pos
+        try:
+            delta = Action.move[action]
+            new_pos = (self.current_pos[0] + delta[0], self.current_pos[1] + delta[1])
+            self.visited[new_pos] += 1
+            self.neighbours[new_pos].append(self.current_pos)
+            self.neighbours[self.current_pos].append(new_pos)
+            self.current_pos = new_pos
+        except:
+            pass
 
     def unvisit(self, action):
         delta = Action.move[action]
