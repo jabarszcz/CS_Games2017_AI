@@ -33,8 +33,8 @@ class Environnement(object):
                 if not self.power_up_taken:
                     self.power_up_avail = True
                 self.power_up_taken = True
-        except:
-            pass
+        except Exception as e:
+            print 'err', str(e)
 
     def try_take(self, pos):
         if not self.power_up_taken and pos == self.power_up:
