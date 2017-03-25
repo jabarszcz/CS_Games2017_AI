@@ -31,9 +31,16 @@ class Environnement(object):
             self.current_pos = new_pos
             if self.current_pos == self.power_up_taken:
                 self.power_up_taken = True
+                print 'power up taken'
         except:
             pass
-    
+
+    def try_take(self, pos):
+        if not self.power_up_taken and pos == self.power_up:
+            self.power_up_avail = True
+
+    def use_power_up(self):
+        self.power_up_avail = False
 
     def unvisit(self, action):
         delta = Action.move[action]
