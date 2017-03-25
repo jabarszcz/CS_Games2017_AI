@@ -61,9 +61,9 @@ class HockeyClient(LineReceiver, object):
             direction = ''
             if possible_line == 'north' or possible_line == 'south':
                 direction += possible_line + ' '
-            #is_us = {}.format(self.name) in line
+            is_us = {}.format(self.name) in line
             direction += line.split(' ')[-3]
-            self.env.visit(direction)
+            self.env.visit(direction, is_us)
         if re.match(self.r, line):
             self.env.goal_idx = (self.env.goal_idx + 1) % 2
             print 'invted', self.env.my_goal()

@@ -21,7 +21,7 @@ class Environnement(object):
     def get_neighbours(self, node):
         return self.neighbours[node]
 
-    def visit(self, action):
+    def visit(self, action, is_us):
         try:
             delta = Action.move[action]
             new_pos = (self.current_pos[0] + delta[0], self.current_pos[1] + delta[1])
@@ -30,8 +30,9 @@ class Environnement(object):
             self.neighbours[self.current_pos].append(new_pos)
             self.current_pos = new_pos
             if self.current_pos == self.power_up_taken:
+                if not self.power_up_taken:
+                    self.power_up_avail = True
                 self.power_up_taken = True
-                print 'power up taken'
         except:
             pass
 
@@ -50,13 +51,16 @@ class Environnement(object):
     def use_power_up(self):
         self.power_up_avail = False
 
-    def unvisit(self, action):
+    def unvisit(self, action, is_us):
         delta = Action.move[action]
         new_pos = (self.current_pos[0] - delta[0], self.current_pos[1] - delta[1])
         self.visited[self.current_pos] -= 1
         self.neighbours[new_pos].remove(self.current_pos)
         self.neighbours[self.current_pos].remove(new_pos)
         self.current_pos = new_pos
+        if self.visited[self.power_up] == 0:
+            self.power_up_taken = False
+            self.power_up_avail = False
 
     def my_goal(self):
         return self.possible_goal[self.goal_idx]
