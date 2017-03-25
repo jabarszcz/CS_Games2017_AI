@@ -18,6 +18,7 @@ class HockeyClient(LineReceiver, object):
         self.env = Environnement()
         self.r = re.compile('polarity of the goal has been inverted - \d*')
         self.r4 = re.compile('your goal is \w+ - \d*')
+        self.power_used = False
 
     def connectionMade(self):
         self.sendLine(self.name)
@@ -60,6 +61,7 @@ class HockeyClient(LineReceiver, object):
             direction = ''
             if possible_line == 'north' or possible_line == 'south':
                 direction += possible_line + ' '
+            #is_us = {}.format(self.name) in line
             direction += line.split(' ')[-3]
             self.env.visit(direction)
         if re.match(self.r, line):
@@ -69,10 +71,14 @@ class HockeyClient(LineReceiver, object):
     def play_game(self):
         movs = MovesChecker(self.env)
         dis, best = sys.maxint, 0
-        for move in movs.availableMoves(self.env.current_pos):
+        for move in movs.availableMoves(self.env.current_pos, False):
             pos, dirs = move
             dis, best = min((dis, best), (self.distance(self.env.my_goal(), pos), dirs[0]))
-        self.sendLine(Action.from_number(best))
+        l = ''
+        # If power up, l += 'power '
+        l += Action.from_number(best)
+        self.sendLine(l)
+        self.env.try_take(best)
 
     def distance(self, a, b):
         ax, ay = a

@@ -39,6 +39,14 @@ class Environnement(object):
         if not self.power_up_taken and pos == self.power_up:
             self.power_up_avail = True
 
+    def un_try(self, pos):
+        if self.power_up_taken and pos == self.power_up:
+            self.power_up_avail = False
+
+    def unuse_power_up(self):
+        if self.power_up_taken:
+            self.power_up_avail = True
+
     def use_power_up(self):
         self.power_up_avail = False
 
