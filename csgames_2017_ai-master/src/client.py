@@ -1,3 +1,5 @@
+from __future__ import division
+
 import random
 
 from twisted.internet import protocol
@@ -7,9 +9,9 @@ from twisted.protocols.basic import LineReceiver
 from hockey.action import Action
 from Environnement import Environnement
 from AvailableMoves import *
+from minmax import *
 import sys
 import re
-
 
 class HockeyClient(LineReceiver, object):
     def __init__(self, name, debug):
@@ -61,7 +63,7 @@ class HockeyClient(LineReceiver, object):
             direction = ''
             if possible_line == 'north' or possible_line == 'south':
                 direction += possible_line + ' '
-            is_us = {}.format(self.name) in line
+            is_us = self.name in line
             direction += line.split(' ')[-3]
             self.env.visit(direction, is_us)
         if re.match(self.r, line):
@@ -69,23 +71,63 @@ class HockeyClient(LineReceiver, object):
             print 'invted', self.env.my_goal()
 
     def play_game(self):
-        movs = MovesChecker(self.env)
-        dis, best = sys.maxint, 0
-        for move in movs.availableMoves(self.env.current_pos, False):
-            pos, dirs = move
-            dis, best = min((dis, best), (self.distance(self.env.my_goal(), pos), dirs[0]))
-        l = ''
-        # If power up, l += 'power '
-        l += Action.from_number(best)
-        self.sendLine(l)
-        self.env.try_take(best)
+        gstate = GameState(self.env)
+        best, use_power = gstate.best_move()
+        #movs = MovesChecker(self.env)
+        #dis, best = sys.maxint, 0
+        #for move in movs.availableMoves(self.env.current_pos):
+        #    pos, dirs = move
+        #    dis, best = min((dis, best), (distance(self.env.my_goal(), pos), dirs[0]))
+        line = ""
+        if use_power:
+            line += "power "
+        self.sendLine(line + Action.from_number(best))
 
-    def distance(self, a, b):
-        ax, ay = a
-        bx, by = b
-        return max(abs(ax-bx), abs(ay-by))
+def distance(a, b):
+    ax, ay = a
+    bx, by = b
+    return max(abs(ax-bx), abs(ay-by))
 
+class GameState:
+    def __init__(self, env):
+        self.env = env
+        
+    def utility_heuristic(self, max_player=True):
+        goal_coords = self.env.my_goal() if max_player else self.env.other_goal()
+        dis_comp = 1-distance(self.env.current_pos, goal_coords)/16
+        print(dis_comp) # TODO test if it is good
+        power_up_comp = 1 if self.env.power_up_avail and max_player else 0
+        total = dis_comp
+        if total != 0:
+            total += 0.2 * power_up_comp
+        # TODO add taking the power_up
+        return total
 
+    def moves(self, player_max=True):
+        moves_gen = MovesChecker(self.env)
+        power_up_avail = self.env.power_up_avail if player_max else False
+        for path in moves_gen.availableMoves(self.env.current_pos,
+                                             power_up_avail):
+            yield path
+
+    def do(self, path, max_player):
+        _, dirs, used, used_at = path
+        if used:
+            self.env.use_power_up()
+        for direction in dirs:
+            self.env.visit(Action.Name[direction], max_player)
+
+    def undo(self, path, max_player):
+        _, dirs, used, used_at = path
+        if used:
+            self.env.unuse_power_up()
+        for direction in dirs:
+            self.env.unvisit(Action.Name[direction], max_player)
+
+    def best_move(self):
+        _, path, used, used_at = minmax(self, 3)
+        return (path[0], used and used_at==0)
+        
 class ClientFactory(protocol.ClientFactory):
     def __init__(self, name, debug):
         self.name = name
